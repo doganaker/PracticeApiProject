@@ -28,8 +28,8 @@ namespace PracticeApiProject.UI.Controllers
 
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_configuration["Jwt:Key"],
-                    _configuration["Jwt:Key"],
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
+                    _configuration["Jwt:Issuer"],
                     null,
                     expires: DateTime.Now.AddMinutes(120),
                     signingCredentials: credentials);
@@ -37,33 +37,68 @@ namespace PracticeApiProject.UI.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private async Task<LoginDto> AuthenticateUser(LoginDto login)
-        {
-            LoginDto user = null;
+        //private async Task<LoginDto> AuthenticateUser(LoginDto login)
+        //{
+        //    LoginDto user = null;
 
-            if (login.UserName == "admin")
+        //    if (login.UserName == "admin")
+        //    {
+        //        user = new LoginDto { UserName = "admin", Password = "1234" };
+        //    }
+
+        //    return user;
+        //}
+        private bool AuthenticateUser(LoginDto login)
+        {
+            bool validUser = false;
+
+            if (login.UserName == "admin" && login.Password == "1234")
             {
-                user = new LoginDto { UserName = "admin", Password = "1234" };
+                validUser = true;
             }
 
-            return user;
+            return validUser;
+            
         }
+
+        //[AllowAnonymous]
+        //[HttpPost(nameof(Login))]
+        //public async Task<IActionResult> Login([FromBody] LoginDto data)
+        //{
+        //    IActionResult response = Unauthorized();
+
+        //    var user = await AuthenticateUser(data);
+
+        //    if (data != null)
+        //    {
+        //        var tokenString = GenerateJSONWebToken(user);
+        //        response = Ok(new { Token = tokenString, Message = "Success" });
+        //    }
+
+        //    return response;
+        //}
 
         [AllowAnonymous]
         [HttpPost(nameof(Login))]
-        public async Task<IActionResult> Login([FromBody] LoginDto data)
+        public IActionResult Login([FromBody] LoginDto data)
         {
-            IActionResult response = Unauthorized();
-
-            var user = await AuthenticateUser(data);
-
-            if (data != null)
+            if(data == null)
             {
-                var tokenString = GenerateJSONWebToken(user);
-                response = Ok(new { Token = tokenString, Message = "Success" });
+                return Unauthorized();
             }
 
-            return response;
+            string tokenString = string.Empty;
+            bool validUser = AuthenticateUser(data);
+            if (validUser)
+            {
+                tokenString = GenerateJSONWebToken(data);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+            return Ok(new { Token = tokenString });
         }
 
         [HttpGet(nameof(Get))]
