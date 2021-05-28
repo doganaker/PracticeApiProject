@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,14 +23,21 @@ namespace PracticeApiProject.UI.Controllers
             _configuration = configuration;
         }
 
-        private string GenerateJSONWebToken(LoginDto userInfo)
+        private string GenerateJSONWebToken(LoginDto userInfo, string roleName)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            List<Claim> claimList = new List<Claim>()
+            {
+                //new Claim("UserId", "1"),
+                new Claim(ClaimTypes.Role, roleName)
+            };
 
-            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-                    _configuration["Jwt:Issuer"],
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
+
+            var token = new JwtSecurityToken(issuer: _configuration["Jwt:Issuer"], 
+                   audience: _configuration["Jwt:Issuer"], 
+                   claims: claimList,
                     null,
                     expires: DateTime.Now.AddMinutes(120),
                     signingCredentials: credentials);
@@ -48,12 +56,21 @@ namespace PracticeApiProject.UI.Controllers
 
         //    return user;
         //}
-        private bool AuthenticateUser(LoginDto login)
+        private bool AuthenticateUser(LoginDto login, out string roleName)
         {
             bool validUser = false;
+            roleName = string.Empty;
 
             if (login.UserName == "admin" && login.Password == "1234")
             {
+                roleName = "Admin";
+
+                validUser = true;
+            }
+            else if (login.UserName == "dogan" && login.Password == "1234")
+            {
+                roleName = "User";
+
                 validUser = true;
             }
 
@@ -88,10 +105,11 @@ namespace PracticeApiProject.UI.Controllers
             }
 
             string tokenString = string.Empty;
-            bool validUser = AuthenticateUser(data);
+            string roleName = string.Empty;
+            bool validUser = AuthenticateUser(data, out roleName);
             if (validUser)
             {
-                tokenString = GenerateJSONWebToken(data);
+                tokenString = GenerateJSONWebToken(data, roleName);
             }
             else
             {
