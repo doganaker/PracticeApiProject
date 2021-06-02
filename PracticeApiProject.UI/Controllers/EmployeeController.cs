@@ -35,11 +35,11 @@ namespace PracticeApiProject.UI.Controllers
 
         [HttpPost(nameof(AddEmployee))]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "Admin")]
-        public IActionResult AddEmployee([FromBody] Employee employee)
+        public IActionResult AddEmployee([FromBody] EmployeeDto employeeDto)
         {
             if (ModelState.IsValid)
             {
-                //Employee employee = _mapper.Map<Employee>(employeeDto);
+                Employee employee = _mapper.Map<Employee>(employeeDto);
 
                 _employeeService.AddEmployee(employee);
 

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PracticeApiProject.Services.EmployeeService;
+using PracticeApiProject.Services.EmployeeService.Mapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace PracticeApiProject.UI
                 //        return new BadRequestObjectResult(modelState);
                 //    };
                 //});
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(EmployeeProfile));
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSwaggerGen(swagger =>
             {

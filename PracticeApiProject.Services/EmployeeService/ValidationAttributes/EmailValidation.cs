@@ -1,24 +1,24 @@
-﻿using PracticeApiProject.Domain.Entities;
+﻿using PracticeApiProject.Services.EmployeeService.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace PracticeApiProject.Domain.CustomValidationAttributes
+namespace PracticeApiProject.Services.EmployeeService.ValidationAttributes
 {
-    public class CustomEmailValidation : ValidationAttribute
+    public class EmailValidation : ValidationAttribute
     {
         private readonly string allowedDomain;
-        public CustomEmailValidation(string allowedDomain)
+        public EmailValidation(string allowedDomain)
         {
             this.allowedDomain = allowedDomain;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var employee = (Employee)validationContext.ObjectInstance;
+            var employee = (EmployeeDto)validationContext.ObjectInstance;
 
-            if(employee.Email == null)
+            if (employee.Email == null)
             {
                 return new ValidationResult("Email is required!!!");
             }
@@ -33,6 +33,5 @@ namespace PracticeApiProject.Domain.CustomValidationAttributes
         //    string[] strings = value.ToString().Split("@");
         //    return strings[1].ToUpper() == allowedDomain.ToUpper();
         //}
-        
     }
 }
