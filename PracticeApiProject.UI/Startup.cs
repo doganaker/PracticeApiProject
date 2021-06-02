@@ -29,15 +29,15 @@ namespace PracticeApiProject.UI
         {
             services.AddCors();
             services.AddControllers();
-            services.AddMvc()
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.InvalidModelStateResponseFactory = actionContext =>
-                    {
-                        var modelState = actionContext.ModelState.Values;
-                        return new BadRequestObjectResult(modelState);
-                    };
-                });
+            services.AddMvc();
+                //.ConfigureApiBehaviorOptions(options =>
+                //{
+                //    options.InvalidModelStateResponseFactory = actionContext =>
+                //    {
+                //        var modelState = actionContext.ModelState.Values;
+                //        return new BadRequestObjectResult(modelState);
+                //    };
+                //});
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSwaggerGen(swagger =>

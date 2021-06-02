@@ -48,7 +48,7 @@ namespace PracticeApiProject.UI.Controllers
                 return Ok(employee);
             }
 
-            return BadRequest((ModelState.Values));
+            return BadRequest(ModelState);
         }
     }
 }
