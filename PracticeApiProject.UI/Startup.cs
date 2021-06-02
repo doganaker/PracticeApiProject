@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +29,16 @@ namespace PracticeApiProject.UI
         {
             services.AddCors();
             services.AddControllers();
-            services.AddMvc();
+            services.AddMvc()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.InvalidModelStateResponseFactory = actionContext =>
+                    {
+                        var modelState = actionContext.ModelState.Values;
+                        return new BadRequestObjectResult(modelState);
+                    };
+                });
+            services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSwaggerGen(swagger =>
             {
@@ -68,7 +78,7 @@ namespace PracticeApiProject.UI
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                //option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters

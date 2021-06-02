@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PracticeApiProject.Domain.Entities;
 using PracticeApiProject.Services.EmployeeService;
@@ -13,15 +15,17 @@ namespace PracticeApiProject.UI.Controllers
 {
     public class EmployeeController : BaseController
     {
-        private readonly IEmployeeService _employeeService;
+        private readonly IEmployeeService _employeeService; 
+        private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(IEmployeeService employeeService, IMapper mapper)
         {
             _employeeService = employeeService;
+            _mapper = mapper;
         }
 
         [HttpGet(nameof(Index))]
-        [Authorize(Roles = "User")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "User")]
         public IActionResult Index()
         {
             var employees = _employeeService.GetEmployees();
@@ -30,14 +34,21 @@ namespace PracticeApiProject.UI.Controllers
         }
 
         [HttpPost(nameof(AddEmployee))]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "Admin")]
         public IActionResult AddEmployee([FromBody] Employee employee)
         {
-            _employeeService.AddEmployee(employee);
+            if (ModelState.IsValid)
+            {
+                //Employee employee = _mapper.Map<Employee>(employeeDto);
 
-            //User.Claims.FirstOrDefault(x => x.Type == "UserId")
+                _employeeService.AddEmployee(employee);
 
-            return Ok(employee);
+                //User.Claims.FirstOrDefault(x => x.Type == "UserId")
+                
+                return Ok(employee);
+            }
+
+            return BadRequest((ModelState.Values));
         }
     }
 }

@@ -38,9 +38,8 @@ namespace PracticeApiProject.UI.Controllers
             var token = new JwtSecurityToken(issuer: _configuration["Jwt:Issuer"], 
                    audience: _configuration["Jwt:Issuer"], 
                    claims: claimList,
-                    null,
-                    expires: DateTime.Now.AddMinutes(120),
-                    signingCredentials: credentials);
+                   expires: DateTime.Now.AddMinutes(120),
+                   signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
